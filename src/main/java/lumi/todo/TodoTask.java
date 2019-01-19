@@ -37,7 +37,7 @@ public class TodoTask implements Callable<Boolean> {
             } catch (ExecutionException e) {
 
                 System.err.println("Error waiting for task:");
-                e.getCause().printStackTrace();
+                e.printStackTrace();
 
             } catch (TimeoutException e) {
 

@@ -8,9 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import lumi.todo.util.TodoUtil;
 
@@ -20,11 +18,19 @@ public class TodoListAccessor {
     private final String tempFileName;
     private final String homeDir;
 
-    TodoListAccessor(String todoFileName, String tempFileName) {
+    TodoListAccessor(String todoFileName, String tempFileName) throws IOException {
 
         this.todoFileName = todoFileName;
         this.tempFileName = tempFileName;
         this.homeDir = System.getProperty("user.home") + "/";
+
+        File todoList = new File(homeDir + todoFileName);
+
+        if (!todoList.isFile()) {
+
+            todoList.getParentFile().mkdirs();
+            todoList.createNewFile();
+        }
     }
 
     void addItem(String item) {
@@ -40,7 +46,7 @@ public class TodoListAccessor {
         } catch (IOException e) {
 
             System.err.println("Could not add item:");
-            e.getCause().printStackTrace();
+            e.printStackTrace();
         }
     }
 
@@ -93,7 +99,7 @@ public class TodoListAccessor {
         } catch (IOException e) {
 
             System.err.println("Could not open todo list:");
-            e.getCause().printStackTrace();
+            e.printStackTrace();
 
             return;
         }
@@ -132,7 +138,7 @@ public class TodoListAccessor {
         } catch (IOException e) {
 
             System.err.println("Could not remove item(s):");
-            e.getCause().printStackTrace();
+            e.printStackTrace();
         }
 
         if (itemsToRemove.size() > 1) {
@@ -165,7 +171,7 @@ public class TodoListAccessor {
         } catch (IOException e) {
 
             System.err.println("Could not open todo list:");
-            e.getCause().printStackTrace();
+            e.printStackTrace();
         }
     }
 
@@ -198,7 +204,7 @@ public class TodoListAccessor {
                 } catch (InterruptedException e) {
 
                     System.err.println("Task wait interrupted:");
-                    e.getCause().printStackTrace();
+                    e.printStackTrace();
                 }
             }
 

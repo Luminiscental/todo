@@ -1,14 +1,16 @@
 package lumi.todo;
 
+import java.io.IOException;
 import java.util.Arrays;
+
+import lumi.todo.util.Config;
 
 public class Todo {
 
-    // TODO: Use a config file to customize this
-    public static final String TODO_FILE_NAME = "todo_list_test";
-    public static final String TEMP_FILE_NAME = TODO_FILE_NAME + "~";
-
     public static void main(String[] args) {
+
+        String todoFileName = Config.TODO_FILE.getValue();
+        String tempFileName = todoFileName + "~";
 
         if (args.length == 0) {
 
@@ -16,12 +18,23 @@ public class Todo {
             printUsage();
 
             System.exit(1);
+            return;
         }
 
-        // Leave space after the command
-        System.out.println();
+        TodoListAccessor accessor;
 
-        var accessor = new TodoListAccessor(TODO_FILE_NAME, TEMP_FILE_NAME);
+        try {
+
+            accessor = new TodoListAccessor(todoFileName, tempFileName);
+
+        } catch (IOException e) {
+
+            System.err.println("Could not access todo file:");
+            e.printStackTrace();
+
+            System.exit(3);
+            return;
+        }
 
         var command = args[0];
         var params = Arrays.copyOfRange(args, 1, args.length);
@@ -66,8 +79,6 @@ public class Todo {
         }
 
         accessor.addItem(args[0]);
-
-        System.exit(0);
     }
 
     public static void removeCommand(TodoListAccessor accessor, String[] args) {
@@ -78,14 +89,11 @@ public class Todo {
         }
 
         accessor.removeItem(args[0]);
-
-        System.exit(0);
     }
 
     public static void listCommand(TodoListAccessor accessor) {
 
         accessor.printItems();
-        System.exit(0);
     }
 
     public static void doCommand(TodoListAccessor accessor, String[] args) {
@@ -103,12 +111,10 @@ public class Todo {
 
         } else {
 
-            minutes = 15;
+            minutes = Integer.parseInt(Config.TIMEOUT.getValue());
         }
 
         accessor.doItem(args[0], minutes);
-
-        System.exit(0);
     }
 
     public static void printUsage() {
