@@ -5,10 +5,7 @@
  * Learn how to create Gradle builds at https://guides.gradle.org/creating-new-gradle-builds/
  */
 
-plugins {
-
-    id 'java'
-}
+apply plugin: 'java'
 
 jar {
 
@@ -16,5 +13,11 @@ jar {
 
         attributes 'Main-Class': 'lumi.todo.Todo'
     }
+}
+
+task copyJar(type: Copy) {
+
+    from jar
+    into java.nio.file.Paths.get(System.getProperty('user.home')).resolve('.todo')
 }
 
