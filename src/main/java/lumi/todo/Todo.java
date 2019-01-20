@@ -117,14 +117,38 @@ public class Todo {
         accessor.doItem(args[0], minutes);
     }
 
+    public static void printCommandUsage(String command, String description, String template, String example) {
+
+        System.out.println();
+        System.out.println("\t" + command + " - " + description);
+        System.out.println("\t" + template);
+        System.out.println("\tExample usage: " + example);
+    }
+
     public static void printUsage() {
 
+        System.out.println();
         System.out.println("Usage: todo <command> <args>");
         System.out.println("Commands:");
 
-        System.out.println("\tadd - Takes one argument and adds it as an item on the todo list");
-        System.out.println("\tremove - Takes one argument and removes any items on the todo list that start with it (case insensitive)");
-        System.out.println("\tlist - Lists all items in the todo list");
-        System.out.println("\tdo - Takes one argument and gives you 15 minutes (or another number of minutes specified as  a second argument) to complete or work on the task");
+        printCommandUsage("add",
+                          "Takes one argument and adds it as an item on the todo list",
+                          "todo add <item>",
+                          "todo add \"Wash the dishes\"");
+
+        printCommandUsage("remove",
+                          "Takes one argument and removes any items on the todo list matching it",
+                          "todo remove <item>",
+                          "todo remove wash");
+
+        printCommandUsage("list",
+                          "Lists all items in the todo list",
+                          "todo list",
+                          "todo list");
+
+        printCommandUsage("do",
+                          "Takes an argument item and gives you a default number of minutes (unless specified) to complete / work on the task",
+                          "todo do <item> [<minutes>]",
+                          "todo do wash 10");
     }
 }
