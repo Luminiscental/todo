@@ -71,7 +71,6 @@ public class TodoTask implements Callable<Boolean> {
                     Thread.sleep(200);
                 }
 
-
                 Optional<Boolean> result = Optional.empty();
 
                 do {

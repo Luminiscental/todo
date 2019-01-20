@@ -77,7 +77,6 @@ public class TodoListAccessor {
         if (!tempFile.renameTo(todoFile)) {
 
             System.err.println("Could not update file");
-            return;
         }
     }
 
