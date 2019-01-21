@@ -7,7 +7,7 @@ If for whatever reason you want to use this run the `copyJar` task and move `tod
 
 ## Config
 
-* `todoFile` - Specifies the path relative to your home directory to the file where items on the todo list are stored. Note that if you have items on the list and change this you will need to them to the new location or re-add them. Default value is `.todo/todo`.
+* `todoFile` - Specifies the path relative to your home directory to the file where items on the todo list are stored. Note that if you have items on the list and change this you will need to copy them to the new file or re-add them. Default value is `.todo/todo`.
 
   e.g. `todoFile = .config/todo/todo.txt` stores items in `~/.config/todo/todo.txt`.
   
