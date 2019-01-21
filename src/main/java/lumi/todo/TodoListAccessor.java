@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lumi.todo.util.Config;
 import lumi.todo.util.TodoUtil;
 
 public class TodoListAccessor {
@@ -164,7 +165,11 @@ public class TodoListAccessor {
 
             } else {
 
-                items.forEach(line -> System.out.println("- " + line));
+                String layout = Config.LAYOUT.getValue();
+
+                items.stream()
+                     .map(item -> layout.replace("$item", item))
+                     .forEach(System.out::println);
             }
 
         } catch (IOException e) {

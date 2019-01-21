@@ -7,8 +7,9 @@ import java.util.stream.Collectors;
 
 public enum Config {
 
-    TODO_FILE("todoFile", ".todo/todo"),
-    TIMEOUT("timeout", "15");
+    TODO_FILE(".todo/todo"),
+    TIMEOUT("15"),
+    LAYOUT("- $item");
 
     private static final String CONFIG_FILE = ".todo/config";
 
@@ -16,9 +17,9 @@ public enum Config {
     private final String defaultValue;
     private final String homeDir;
 
-    Config(String variableName, String defaultValue) {
+    Config(String defaultValue) {
 
-        this.variableName = variableName;
+        this.variableName = TodoUtil.convertSnakeToCamel(name());
         this.defaultValue = defaultValue;
         this.homeDir = System.getProperty("user.home") + "/";
     }
