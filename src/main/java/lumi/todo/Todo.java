@@ -61,6 +61,11 @@ public class Todo {
             doCommand(accessor, params);
             break;
 
+        case "-f":
+
+            // TODO: Support tab-completion maybe?
+            break;
+
         default:
 
             System.err.println("Unsupported command \"" + command + "\"");
