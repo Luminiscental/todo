@@ -10,18 +10,17 @@ public class TodoUtil {
     public static String convertSnakeToCamel(String snake) {
 
         String pascalCase = Arrays.stream(snake.split("\\_"))
-                                  .map(String::toLowerCase)
-                                  .map(s -> s.substring(0, 1).toUpperCase() + s.substring(1))
-                                  .collect(Collectors.joining());
+            .map(String::toLowerCase)
+            .map(s -> s.substring(0, 1).toUpperCase() + s.substring(1))
+            .collect(Collectors.joining());
 
         return Character.toLowerCase(pascalCase.charAt(0)) + pascalCase.substring(1);
     }
 
-    public static boolean getConfirmation(String question) {
+    public static boolean getConfirmation(String question, Scanner scanner) {
 
         System.out.print(question + " [y/n] :");
 
-        Scanner scanner = new Scanner(System.in);
         Optional<Boolean> answer = Optional.empty();
 
         do {
@@ -44,7 +43,6 @@ public class TodoUtil {
 
         } while (answer.isEmpty());
 
-        scanner.close();
         return answer.get();
     }
 }

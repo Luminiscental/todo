@@ -6,9 +6,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import lumi.todo.util.Config;
 import lumi.todo.util.TodoUtil;
@@ -53,10 +54,11 @@ public class TodoListAccessor {
 
     List<String> getItems() throws IOException {
 
-        List<String> result = new ArrayList<>();
-
         var input = new BufferedReader(new FileReader(homeDir + todoFileName));
-        input.lines().forEach(result::add);
+
+        List<String> result = input.lines()
+            .collect(Collectors.toList());
+
         input.close();
 
         return result;
@@ -69,7 +71,8 @@ public class TodoListAccessor {
 
         var output = new PrintWriter(new FileWriter(tempFile));
 
-        newItems.forEach(output::println);
+        newItems
+            .forEach(output::println);
 
         output.close();
 
@@ -83,10 +86,12 @@ public class TodoListAccessor {
 
     List<String> getMatchingItems(String item) throws IOException {
 
-        return getItems().stream().filter(line -> line.toLowerCase().startsWith(item.toLowerCase())).collect(Collectors.toList());
+        return getItems().stream()
+            .filter(line -> line.toLowerCase().startsWith(item.toLowerCase()))
+            .collect(Collectors.toList());
     }
 
-    void removeItem(String item) {
+    void removeItem(String item, Scanner scanner) {
 
         List<String> itemsRemaining;
         List<String> itemsToRemove;
@@ -120,12 +125,53 @@ public class TodoListAccessor {
 
             System.out.println("Warning: Multiple lines match:");
 
-            itemsToRemove.forEach(line -> System.out.println("\"" + line + "\""));
+            itemsToRemove
+                .forEach(line -> System.out.println("\"" + line + "\""));
 
-            if (!TodoUtil.getConfirmation("Remove all?")) {
+            if (!TodoUtil.getConfirmation("Remove all?", scanner)) {
 
-                System.out.println("No items were removed");
-                return;
+                if (!TodoUtil.getConfirmation("Pick one?", scanner)) {
+
+                    System.out.println("No items were removed");
+                    return;
+
+                } else {
+
+                    System.out.print("Choose an index [0-" + (itemsToRemove.size() - 1) + "] :");
+                    boolean chosen = false;
+
+                    int index;
+
+                    do {
+
+                        index = scanner.nextInt();
+                        scanner.nextLine();
+                        System.out.println();
+
+                        if (index < 0 || index >= itemsToRemove.size()) {
+
+                            if (TodoUtil.getConfirmation("Invalid index, cancel?", scanner)) {
+
+                                return;
+
+                            } else {
+
+                                System.out.print("Please choose a valid index [0-" + (itemsToRemove.size() - 1) + "] :");
+                            }
+
+                        } else {
+
+                            chosen = true;
+                        }
+
+                    } while (!chosen);
+
+                    final int chosenIndex = index;
+
+                    IntStream.range(0, itemsToRemove.size())
+                        .filter(i -> i != chosenIndex)
+                        .forEach(itemsToRemove::remove);
+                }
             }
         }
 
@@ -144,7 +190,9 @@ public class TodoListAccessor {
         if (itemsToRemove.size() > 1) {
 
             System.out.println("Removed " + itemsToRemove.size() + " items:");
-            itemsToRemove.forEach(line -> System.out.println("\"" + line + "\""));
+
+            itemsToRemove
+                .forEach(line -> System.out.println("\"" + line + "\""));
 
         } else if (itemsToRemove.size() == 1) {
 
@@ -168,8 +216,8 @@ public class TodoListAccessor {
                 String layout = Config.LAYOUT.getValue();
 
                 items.stream()
-                     .map(item -> layout.replace("$item", item))
-                     .forEach(System.out::println);
+                    .map(item -> layout.replace("$item", item))
+                    .forEach(System.out::println);
             }
 
         } catch (IOException e) {
@@ -179,7 +227,7 @@ public class TodoListAccessor {
         }
     }
 
-    void doItem(String item, int minutes) {
+    void doItem(String item, int minutes, Scanner scanner) {
 
         try {
 
@@ -192,17 +240,19 @@ public class TodoListAccessor {
             } else if (items.size() > 1) {
 
                 System.err.println("Item \"" + item.toLowerCase() + "...\" is ambiguous, could be any of:");
-                items.forEach(line -> System.err.println("- " + line));
+
+                items
+                    .forEach(line -> System.err.println("- " + line));
 
             } else {
 
                 try {
 
-                    boolean completed = TodoTask.work(items.get(0), minutes);
+                    boolean completed = TodoTask.work(items.get(0), minutes, scanner);
 
                     if (completed) {
 
-                        removeItem(items.get(0));
+                        removeItem(items.get(0), scanner);
                     }
 
                 } catch (InterruptedException e) {

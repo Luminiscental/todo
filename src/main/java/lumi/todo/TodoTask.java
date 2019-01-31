@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Optional;
+import java.util.Scanner;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -18,7 +19,7 @@ public class TodoTask implements Callable<Boolean> {
 
     private TodoTask() {}
 
-    public static boolean work(String taskDescription, int minutes) throws InterruptedException {
+    public static boolean work(String taskDescription, int minutes, Scanner scanner) throws InterruptedException {
 
         System.out.println("Go and do \"" + taskDescription + "\" (" + minutes + " minutes)");
         System.out.print("Type \"f\" if you finish early or \"i\" if you must leave it incomplete and stop early :");
@@ -43,7 +44,7 @@ public class TodoTask implements Callable<Boolean> {
 
                 System.out.println();
                 System.out.println("Time up:");
-                completed = TodoUtil.getConfirmation("Did you complete the task?");
+                completed = TodoUtil.getConfirmation("Did you complete the task?", scanner);
                 result.cancel(true);
             }
 

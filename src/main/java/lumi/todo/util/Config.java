@@ -29,7 +29,10 @@ public enum Config {
         try {
 
             var input = new BufferedReader(new FileReader(homeDir + CONFIG_FILE));
-            var lines = input.lines().collect(Collectors.toList());
+
+            var lines = input.lines()
+                .collect(Collectors.toList());
+
             input.close();
 
             for (var line : lines) {

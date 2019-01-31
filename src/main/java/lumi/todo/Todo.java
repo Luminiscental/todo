@@ -2,6 +2,7 @@ package lumi.todo;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Scanner;
 
 import lumi.todo.util.Config;
 
@@ -39,6 +40,8 @@ public class Todo {
         var command = args[0];
         var params = Arrays.copyOfRange(args, 1, args.length);
 
+        Scanner scanner = new Scanner(System.in);
+
         switch (command) {
 
         case "add":
@@ -48,7 +51,7 @@ public class Todo {
 
         case "remove":
 
-            removeCommand(accessor, params);
+            removeCommand(accessor, params, scanner);
             break;
 
         case "list":
@@ -58,7 +61,7 @@ public class Todo {
 
         case "do":
 
-            doCommand(accessor, params);
+            doCommand(accessor, params, scanner);
             break;
 
         case "-f":
@@ -71,9 +74,12 @@ public class Todo {
             System.err.println("Unsupported command \"" + command + "\"");
             printUsage();
 
+            scanner.close();
             System.exit(2);
             break;
         }
+
+        scanner.close();
     }
 
     public static void addCommand(TodoListAccessor accessor, String[] args) {
@@ -86,14 +92,14 @@ public class Todo {
         accessor.addItem(args[0]);
     }
 
-    public static void removeCommand(TodoListAccessor accessor, String[] args) {
+    public static void removeCommand(TodoListAccessor accessor, String[] args, Scanner scanner) {
 
         if (args.length < 1) {
 
             System.err.println("Not enough arguments, remove expects one");
         }
 
-        accessor.removeItem(args[0]);
+        accessor.removeItem(args[0], scanner);
     }
 
     public static void listCommand(TodoListAccessor accessor) {
@@ -101,7 +107,7 @@ public class Todo {
         accessor.printItems();
     }
 
-    public static void doCommand(TodoListAccessor accessor, String[] args) {
+    public static void doCommand(TodoListAccessor accessor, String[] args, Scanner scanner) {
 
         if (args.length < 1) {
 
@@ -119,7 +125,7 @@ public class Todo {
             minutes = Integer.parseInt(Config.TIMEOUT.getValue());
         }
 
-        accessor.doItem(args[0], minutes);
+        accessor.doItem(args[0], minutes, scanner);
     }
 
     public static void printCommandUsage(String command, String description, String template, String example) {
