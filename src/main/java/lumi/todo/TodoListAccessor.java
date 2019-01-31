@@ -125,8 +125,15 @@ public class TodoListAccessor {
 
             System.out.println("Warning: Multiple lines match:");
 
-            itemsToRemove
-                .forEach(line -> System.out.println("\"" + line + "\""));
+            System.out.println();
+
+            for (int i = 0; i < itemsToRemove.size(); i++) {
+
+                var line = itemsToRemove.get(i);
+                System.out.println("[" + i + "] \"" + line + "\"");
+            }
+
+            System.out.println();
 
             if (!TodoUtil.getConfirmation("Remove all?", scanner)) {
 
@@ -146,7 +153,6 @@ public class TodoListAccessor {
 
                         index = scanner.nextInt();
                         scanner.nextLine();
-                        System.out.println();
 
                         if (index < 0 || index >= itemsToRemove.size()) {
 

@@ -37,8 +37,7 @@ public class TodoUtil {
 
             } else {
 
-                System.out.println();
-                System.out.println("Please answer with \"y\" or \"n\"");
+                System.out.print("Please answer with \"y\" or \"n\" :");
             }
 
         } while (answer.isEmpty());
