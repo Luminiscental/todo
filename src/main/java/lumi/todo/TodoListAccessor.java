@@ -172,7 +172,7 @@ public class TodoListAccessor {
 
                     } while (!chosen);
 
-                    final int chosenIndex = index;
+                    final int chosenIndex = index - 1;
 
                     IntStream.range(0, itemsToRemove.size())
                         .filter(i -> i != chosenIndex)
