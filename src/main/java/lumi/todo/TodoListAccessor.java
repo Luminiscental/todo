@@ -130,7 +130,7 @@ public class TodoListAccessor {
             for (int i = 0; i < itemsToRemove.size(); i++) {
 
                 var line = itemsToRemove.get(i);
-                System.out.println("[" + i + "] \"" + line + "\"");
+                System.out.println("[" + (i + 1) + "] \"" + line + "\"");
             }
 
             System.out.println();
@@ -144,7 +144,7 @@ public class TodoListAccessor {
 
                 } else {
 
-                    System.out.print("Choose an index [0-" + (itemsToRemove.size() - 1) + "] :");
+                    System.out.print("Choose an item [1-" + itemsToRemove.size() + "] :");
                     boolean chosen = false;
 
                     int index;
