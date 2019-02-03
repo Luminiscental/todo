@@ -40,6 +40,7 @@ public class Todo {
         var command = args[0];
         var params = Arrays.copyOfRange(args, 1, args.length);
 
+        @SuppressWarnings("resource")
         Scanner scanner = new Scanner(System.in);
 
         switch (command) {
@@ -74,12 +75,9 @@ public class Todo {
             System.err.println("Unsupported command \"" + command + "\"");
             printUsage();
 
-            scanner.close();
             System.exit(2);
             break;
         }
-
-        scanner.close();
     }
 
     public static void addCommand(TodoListAccessor accessor, String[] args) {
