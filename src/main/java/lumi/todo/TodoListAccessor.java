@@ -154,7 +154,7 @@ public class TodoListAccessor {
                         index = scanner.nextInt();
                         scanner.nextLine();
 
-                        if (index < 0 || index >= itemsToRemove.size()) {
+                        if (index < 1 || index > itemsToRemove.size()) {
 
                             if (TodoUtil.getConfirmation("Invalid index, cancel?", scanner)) {
 
@@ -162,7 +162,7 @@ public class TodoListAccessor {
 
                             } else {
 
-                                System.out.print("Please choose a valid index [0-" + (itemsToRemove.size() - 1) + "] :");
+                                System.out.print("Please choose a valid index [1-" + itemsToRemove.size() + "] :");
                             }
 
                         } else {
