@@ -37,13 +37,21 @@ public class TodoListAccessor {
 
     void addItem(String item) {
 
+        addItem(item, true);
+    }
+
+    void addItem(String item, boolean display) {
+
         try {
 
             var output = new PrintWriter(new FileWriter(homeDir + todoFileName, true));
             output.println(item);
             output.close();
 
-            System.out.println("Added item \"" + item + "\"");
+            if (display) {
+                
+                System.out.println("Added item \"" + item + "\"");
+            }
 
         } catch (IOException e) {
 
@@ -205,6 +213,109 @@ public class TodoListAccessor {
             System.out.println("Removed item \"" + itemsToRemove.get(0) + "\"");
 
         }
+    }
+
+    void replaceItem(String item, String replacement, Scanner scanner) {
+
+        List<String> itemsRemaining;
+        List<String> itemsToRemove;
+
+        try {
+
+            itemsRemaining = getItems();
+            itemsToRemove = getMatchingItems(item);
+
+        } catch (IOException e) {
+
+            System.err.println("Could not open todo list:");
+            e.printStackTrace();
+
+            return;
+        }
+
+        if (itemsRemaining.size() == 0) {
+
+            System.out.println("Warning: no items to replace");
+            return;
+        }
+
+        if (itemsToRemove.size() == 0) {
+
+            System.out.println("Warning: could not find any items matching \"" + item.toLowerCase() + "...\"");
+            return;
+        }
+
+        if (itemsToRemove.size() > 1) {
+
+            System.out.println("Warning: Multiple lines match:");
+
+            System.out.println();
+
+            for (int i = 0; i < itemsToRemove.size(); i++) {
+
+                var line = itemsToRemove.get(i);
+                System.out.println("[" + (i + 1) + "] \"" + line + "\"");
+            }
+
+            System.out.println();
+
+            if (!TodoUtil.getConfirmation("Pick one?", scanner)) {
+
+                System.out.println("No item replaced");
+                return;
+
+            } else {
+
+                System.out.print("Choose an item [1-" + itemsToRemove.size() + "] :");
+                boolean chosen = false;
+
+                int index;
+
+                do {
+
+                    index = scanner.nextInt();
+                    scanner.nextLine();
+
+                    if (index < 1 || index > itemsToRemove.size()) {
+
+                        if (TodoUtil.getConfirmation("Invalid index, cancel?", scanner)) {
+
+                            return;
+
+                        } else {
+
+                            System.out.print("Please choose a valid index [1-" + itemsToRemove.size() + "] :");
+                        }
+
+                    } else {
+
+                        chosen = true;
+                    }
+
+                } while (!chosen);
+
+                final int chosenIndex = index - 1;
+
+                IntStream.range(0, itemsToRemove.size())
+                    .filter(i -> i != chosenIndex)
+                    .forEach(itemsToRemove::remove);
+            }
+        }
+
+        itemsRemaining.removeAll(itemsToRemove);
+
+        try {
+
+            replaceList(itemsRemaining);
+            addItem(replacement, false);
+
+        } catch (IOException e) {
+
+            System.err.println("Could not replace item:");
+            e.printStackTrace();
+        }
+
+        System.out.println("Replaced item \"" + itemsToRemove.get(0) + "\" with \"" + replacement + "\"");
     }
 
     void printItems() {

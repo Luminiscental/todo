@@ -55,6 +55,11 @@ public class Todo {
             removeCommand(accessor, params, scanner);
             break;
 
+        case "replace":
+
+            replaceCommand(accessor, params, scanner);
+            break;
+
         case "list":
 
             listCommand(accessor);
@@ -67,7 +72,6 @@ public class Todo {
 
         case "-f":
 
-            // TODO: Support tab-completion maybe?
             break;
 
         default:
@@ -98,6 +102,16 @@ public class Todo {
         }
 
         accessor.removeItem(args[0], scanner);
+    }
+
+    public static void replaceCommand(TodoListAccessor accessor, String[] args, Scanner scanner) {
+
+        if (args.length < 2) {
+
+            System.err.println("Not enough arguments, replace expects two");
+        }
+
+        accessor.replaceItem(args[0], args[1], scanner);
     }
 
     public static void listCommand(TodoListAccessor accessor) {
@@ -149,6 +163,11 @@ public class Todo {
                           "Takes one argument and removes any items on the todo list matching it",
                           "todo remove <item>",
                           "todo remove wash");
+
+        printCommandUsage("replace",
+                          "Takes two arguments; the start of an item to replace followed by what to replace it with",
+                          "todo replace <item> <replacement>",
+                          "todo replace wash \"Dry the dishes\"");
 
         printCommandUsage("list",
                           "Lists all items in the todo list",
