@@ -44,6 +44,14 @@ public class TodoListAccessor {
 
         try {
 
+            var items = getItems();
+
+            if (items.contains(item)) {
+
+                System.out.println("Warning: Item is already in the list!");
+                return;
+            }
+
             var output = new PrintWriter(new FileWriter(homeDir + todoFileName, true));
             output.println(item);
             output.close();
@@ -119,13 +127,13 @@ public class TodoListAccessor {
 
         if (itemsRemaining.size() == 0) {
 
-            System.out.println("Warning: no items to remove");
+            System.out.println("Warning: No items to remove");
             return;
         }
 
         if (itemsToRemove.size() == 0) {
 
-            System.out.println("Warning: could not find any items matching \"" + item.toLowerCase() + "...\"");
+            System.out.println("Warning: Could not find any items matching \"" + item.toLowerCase() + "...\"");
             return;
         }
 
@@ -235,13 +243,13 @@ public class TodoListAccessor {
 
         if (itemsRemaining.size() == 0) {
 
-            System.out.println("Warning: no items to replace");
+            System.out.println("Warning: No items to replace");
             return;
         }
 
         if (itemsToRemove.size() == 0) {
 
-            System.out.println("Warning: could not find any items matching \"" + item.toLowerCase() + "...\"");
+            System.out.println("Warning: Could not find any items matching \"" + item.toLowerCase() + "...\"");
             return;
         }
 
