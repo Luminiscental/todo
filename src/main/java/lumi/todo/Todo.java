@@ -10,8 +10,6 @@ public class Todo {
 
     public static void main(String[] args) {
 
-        // TODO: Check for adding a duplicate
-
         String todoFileName = Config.TODO_FILE.getValue();
         String tempFileName = todoFileName + "~";
 
