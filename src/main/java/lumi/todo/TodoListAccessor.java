@@ -190,9 +190,7 @@ public class TodoListAccessor {
 
                     final int chosenIndex = index - 1;
 
-                    IntStream.range(0, itemsToRemove.size())
-                        .filter(i -> i != chosenIndex)
-                        .forEach(itemsToRemove::remove);
+                    itemsToRemove = List.of(itemsToRemove.get(chosenIndex));
                 }
             }
         }
