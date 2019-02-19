@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -18,6 +19,8 @@ public class TodoListAccessor {
     private final String todoFileName;
     private final String tempFileName;
     private final String homeDir;
+
+    private List<String> items;
 
     TodoListAccessor(String todoFileName, String tempFileName) throws IOException {
 
@@ -32,42 +35,11 @@ public class TodoListAccessor {
             todoList.getParentFile().mkdirs();
             todoList.createNewFile();
         }
+
+        items = getItems();
     }
 
-    void addItem(String item) {
-
-        addItem(item, true);
-    }
-
-    void addItem(String item, boolean display) {
-
-        try {
-
-            var items = getItems();
-
-            if (items.contains(item)) {
-
-                System.out.println("Warning: Item is already in the list!");
-                return;
-            }
-
-            var output = new PrintWriter(new FileWriter(homeDir + todoFileName, true));
-            output.println(item);
-            output.close();
-
-            if (display) {
-                
-                System.out.println("Added item \"" + item + "\"");
-            }
-
-        } catch (IOException e) {
-
-            System.err.println("Could not add item:");
-            e.printStackTrace();
-        }
-    }
-
-    List<String> getItems() throws IOException {
+    private List<String> getItems() throws IOException {
 
         var input = new BufferedReader(new FileReader(homeDir + todoFileName));
 
@@ -79,14 +51,14 @@ public class TodoListAccessor {
         return result;
     }
 
-    void replaceList(List<String> newItems) throws IOException {
+    void close() throws IOException {
     
         var todoFile = new File(homeDir + todoFileName);
         var tempFile = new File(homeDir + tempFileName);
 
         var output = new PrintWriter(new FileWriter(tempFile));
 
-        newItems
+        items
             .forEach(output::println);
 
         output.close();
@@ -99,11 +71,73 @@ public class TodoListAccessor {
         }
     }
 
-    List<String> getMatchingItems(String item) throws IOException {
+    void addItem(String item) {
 
-        return getItems().stream()
+        addItem(item, true);
+    }
+
+    private void addItem(String item, boolean display) {
+
+        if (items.contains(item)) {
+
+            System.out.println("Warning: Item is already in the list!");
+            return;
+        }
+
+        items.add(item);
+
+        if (display) {
+            
+            System.out.println("Added item \"" + item + "\"");
+        }
+    }
+
+    private List<String> getMatchingItems(String item) {
+
+        return items.stream()
             .filter(line -> line.toLowerCase().startsWith(item.toLowerCase()))
             .collect(Collectors.toList());
+    }
+
+    private Optional<String> pickOneItem(List<String> possibleItems, Scanner scanner) {
+
+        if (!TodoUtil.getConfirmation("Pick one?", scanner)) {
+
+            return Optional.empty();
+
+        } else {
+
+            System.out.print("Choose an item [1-" + possibleItems.size() + "] :");
+            boolean chosen = false;
+
+            int index;
+
+            do {
+
+                index = scanner.nextInt();
+                scanner.nextLine();
+
+                if (index < 1 || index > possibleItems.size()) {
+
+                    if (TodoUtil.getConfirmation("Invalid index, cancel?", scanner)) {
+
+                        return Optional.empty();
+
+                    } else {
+
+                        System.out.print("Please choose a valid index [1-" + possibleItems.size() + "] :");
+                    }
+
+                } else {
+
+                    chosen = true;
+                }
+
+            } while (!chosen);
+
+            final int chosenIndex = index - 1;
+            return Optional.of(possibleItems.get(chosenIndex));
+        }
     }
 
     boolean removeItem(String item, Scanner scanner) {
@@ -111,27 +145,13 @@ public class TodoListAccessor {
         return removeItem(item, scanner, "remove", true);
     }
 
-    boolean removeItem(String item, Scanner scanner, String action, boolean allowMultiple) {
+    private boolean removeItem(String item, Scanner scanner, String action, boolean allowMultiple) {
 
         String actionUpper = action.toUpperCase().substring(0, 1) + action.substring(1);
 
-        List<String> itemsRemaining;
-        List<String> itemsToRemove;
+        List<String> itemsToRemove = getMatchingItems(item);
 
-        try {
-
-            itemsRemaining = getItems();
-            itemsToRemove = getMatchingItems(item);
-
-        } catch (IOException e) {
-
-            System.err.println("Could not open todo list:");
-            e.printStackTrace();
-
-            return false;
-        }
-
-        if (itemsRemaining.size() == 0) {
+        if (items.size() == 0) {
 
             System.out.println("Warning: No items to " + action);
             return false;
@@ -159,59 +179,21 @@ public class TodoListAccessor {
 
             if (!allowMultiple || !TodoUtil.getConfirmation(actionUpper + " all?", scanner)) {
 
-                if (!TodoUtil.getConfirmation("Pick one?", scanner)) {
+                Optional<String> chosenItem = pickOneItem(itemsToRemove, scanner);
 
-                    System.out.println("No items were " + action + "d");
-                    return false;
+                if (chosenItem.isPresent()) {
+
+                    itemsToRemove = List.of(chosenItem.get());
 
                 } else {
 
-                    System.out.print("Choose an item [1-" + itemsToRemove.size() + "] :");
-                    boolean chosen = false;
-
-                    int index;
-
-                    do {
-
-                        index = scanner.nextInt();
-                        scanner.nextLine();
-
-                        if (index < 1 || index > itemsToRemove.size()) {
-
-                            if (TodoUtil.getConfirmation("Invalid index, cancel?", scanner)) {
-
-                                return false;
-
-                            } else {
-
-                                System.out.print("Please choose a valid index [1-" + itemsToRemove.size() + "] :");
-                            }
-
-                        } else {
-
-                            chosen = true;
-                        }
-
-                    } while (!chosen);
-
-                    final int chosenIndex = index - 1;
-
-                    itemsToRemove = List.of(itemsToRemove.get(chosenIndex));
+                    System.out.println("No items were " + action + "d");
+                    return false;
                 }
             }
         }
 
-        itemsRemaining.removeAll(itemsToRemove);
-
-        try {
-
-            replaceList(itemsRemaining);
-
-        } catch (IOException e) {
-
-            System.err.println("Could not " + action + " item(s):");
-            e.printStackTrace();
-        }
+        items.removeAll(itemsToRemove);
 
         if (itemsToRemove.size() > 1) {
 
@@ -246,68 +228,63 @@ public class TodoListAccessor {
 
     void printItems() {
 
-        try {
+        if (items.size() == 0) {
 
-            var items = getItems();
+            System.out.println("Nothing to do, well done!");
 
-            if (items.size() == 0) {
+        } else {
 
-                System.out.println("Nothing to do, well done!");
+            String layout = Config.LAYOUT.getValue();
 
-            } else {
-
-                String layout = Config.LAYOUT.getValue();
-
-                items.stream()
-                    .map(item -> layout.replace("$item", item))
-                    .forEach(System.out::println);
-            }
-
-        } catch (IOException e) {
-
-            System.err.println("Could not open todo list:");
-            e.printStackTrace();
+            items.stream()
+                .map(item -> layout.replace("$item", item))
+                .forEach(System.out::println);
         }
     }
 
     void doItem(String item, int minutes, Scanner scanner) {
 
-        try {
+        var matchingItems = getMatchingItems(item);
 
-            var items = getMatchingItems(item);
+        if (matchingItems.size() == 0) {
 
-            if (items.size() == 0) {
+            System.err.println("Could not find any item matching \"" + item.toLowerCase() + "...\"");
 
-                System.err.println("Could not find any item matching \"" + item.toLowerCase() + "...\"");
+        } else if (matchingItems.size() > 1) {
 
-            } else if (items.size() > 1) {
+            System.err.println("Item \"" + item.toLowerCase() + "...\" is ambiguous, could be any of:");
 
-                System.err.println("Item \"" + item.toLowerCase() + "...\" is ambiguous, could be any of:");
+            System.out.println();
 
-                items
-                    .forEach(line -> System.err.println("- " + line));
+            for (int i = 0; i < matchingItems.size(); i++) {
 
-            } else {
-
-                try {
-
-                    boolean completed = TodoTask.work(items.get(0), minutes, scanner);
-
-                    if (completed) {
-
-                        removeItem(items.get(0), scanner);
-                    }
-
-                } catch (InterruptedException e) {
-
-                    System.err.println("Task wait interrupted:");
-                    e.printStackTrace();
-                }
+                var line = matchingItems.get(i);
+                System.out.println("[" + (i + 1) + "] \"" + line + "\"");
             }
 
-        } catch (IOException e) {
+            System.out.println();
 
-            System.err.println("Could not open todo list:");
+            Optional<String> chosenItem = pickOneItem(matchingItems, scanner);
+
+            if (chosenItem.isEmpty()) {
+
+                System.out.println("Not doing anything");
+                return;
+            }
+        }
+
+        try {
+
+            boolean completed = TodoTask.work(matchingItems.get(0), minutes, scanner);
+
+            if (completed) {
+
+                removeItem(matchingItems.get(0), scanner);
+            }
+
+        } catch (InterruptedException e) {
+
+            System.err.println("Task wait interrupted:");
             e.printStackTrace();
         }
     }

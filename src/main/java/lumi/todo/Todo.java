@@ -33,14 +33,13 @@ public class Todo {
             System.err.println("Could not access todo file:");
             e.printStackTrace();
 
-            System.exit(3);
+            System.exit(1);
             return;
         }
 
         var command = args[0];
         var params = Arrays.copyOfRange(args, 1, args.length);
 
-        @SuppressWarnings("resource")
         Scanner scanner = new Scanner(System.in);
 
         switch (command) {
@@ -79,8 +78,21 @@ public class Todo {
             System.err.println("Unsupported command \"" + command + "\"");
             printUsage();
 
-            System.exit(2);
+            System.exit(1);
             break;
+        }
+
+        try {
+
+            accessor.close();
+
+        } catch (IOException e) {
+
+            System.err.println("Could not write to todo file:");
+            e.printStackTrace();
+
+            System.exit(1);
+            return;
         }
     }
 
