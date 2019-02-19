@@ -18,7 +18,6 @@ public class TodoListAccessor {
 
     private final String todoFileName;
     private final String tempFileName;
-    private final String homeDir;
 
     private List<String> items;
 
@@ -26,9 +25,8 @@ public class TodoListAccessor {
 
         this.todoFileName = todoFileName;
         this.tempFileName = tempFileName;
-        this.homeDir = System.getProperty("user.home") + "/";
 
-        File todoList = new File(homeDir + todoFileName);
+        File todoList = new File(Config.HOME_DIR + todoFileName);
 
         if (!todoList.isFile()) {
 
@@ -41,7 +39,7 @@ public class TodoListAccessor {
 
     private List<String> getItems() throws IOException {
 
-        var input = new BufferedReader(new FileReader(homeDir + todoFileName));
+        var input = new BufferedReader(new FileReader(Config.HOME_DIR + todoFileName));
 
         List<String> result = input.lines()
             .collect(Collectors.toList());
@@ -53,8 +51,8 @@ public class TodoListAccessor {
 
     void close() throws IOException {
     
-        var todoFile = new File(homeDir + todoFileName);
-        var tempFile = new File(homeDir + tempFileName);
+        var todoFile = new File(Config.HOME_DIR + todoFileName);
+        var tempFile = new File(Config.HOME_DIR + tempFileName);
 
         var output = new PrintWriter(new FileWriter(tempFile));
 

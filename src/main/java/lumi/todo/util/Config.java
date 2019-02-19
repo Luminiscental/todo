@@ -12,7 +12,7 @@ public enum Config {
     LAYOUT("- $item");
 
     private static final String CONFIG_FILE = ".todo/config";
-    private static final String homeDir = System.getProperty("user.home") + "/";
+    public static final String HOME_DIR = System.getProperty("user.home") + "/";
 
     private final String variableName;
     private final String defaultValue;
@@ -27,7 +27,7 @@ public enum Config {
 
         try {
 
-            var input = new BufferedReader(new FileReader(homeDir + CONFIG_FILE));
+            var input = new BufferedReader(new FileReader(HOME_DIR + CONFIG_FILE));
 
             var lines = input.lines()
                 .collect(Collectors.toList());
