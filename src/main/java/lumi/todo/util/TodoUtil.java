@@ -14,7 +14,7 @@ public class TodoUtil {
             .map(s -> s.substring(0, 1).toUpperCase() + s.substring(1))
             .collect(Collectors.joining());
 
-        return Character.toLowerCase(pascalCase.charAt(0)) + pascalCase.substring(1);
+        return pascalCase.substring(0, 1).toLowerCase() + pascalCase.substring(1);
     }
 
     public static boolean getConfirmation(String question, Scanner scanner) {
