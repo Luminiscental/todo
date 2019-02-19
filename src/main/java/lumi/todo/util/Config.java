@@ -12,16 +12,15 @@ public enum Config {
     LAYOUT("- $item");
 
     private static final String CONFIG_FILE = ".todo/config";
+    private static final String homeDir = System.getProperty("user.home") + "/";
 
     private final String variableName;
     private final String defaultValue;
-    private final String homeDir;
 
     Config(String defaultValue) {
 
         this.variableName = TodoUtil.convertSnakeToCamel(name());
         this.defaultValue = defaultValue;
-        this.homeDir = System.getProperty("user.home") + "/";
     }
 
     public String getValue() {
