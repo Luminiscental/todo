@@ -46,6 +46,12 @@ public enum Config {
 
                 if (split[0].trim().equals(variableName)) {
 
+                    if (split.length < 2) {
+
+                        System.err.println("Invalid syntax, lines must assign to the value");
+                        System.err.println("In \"" + line + "\"");
+                    }
+
                     var value = split[1].trim();
 
                     for (var configVariable : Config.values()) {
