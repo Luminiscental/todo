@@ -26,11 +26,17 @@ public class TodoListAccessor {
         this.todoFileName = todoFileName;
         this.tempFileName = tempFileName;
 
-        File todoList = new File(Config.HOME_DIR + todoFileName);
+        File todoList = new File(todoFileName);
 
         if (!todoList.isFile()) {
 
-            todoList.getParentFile().mkdirs();
+            var parent = todoList.getParentFile();
+
+            if (parent != null) {
+
+                parent.mkdirs();
+            }
+
             todoList.createNewFile();
         }
 
@@ -39,7 +45,7 @@ public class TodoListAccessor {
 
     private List<String> getItems() throws IOException {
 
-        var input = new BufferedReader(new FileReader(Config.HOME_DIR + todoFileName));
+        var input = new BufferedReader(new FileReader(todoFileName));
 
         List<String> result = input.lines()
             .collect(Collectors.toList());
@@ -51,8 +57,8 @@ public class TodoListAccessor {
 
     void close() throws IOException {
     
-        var todoFile = new File(Config.HOME_DIR + todoFileName);
-        var tempFile = new File(Config.HOME_DIR + tempFileName);
+        var todoFile = new File(todoFileName);
+        var tempFile = new File(tempFileName);
 
         var output = new PrintWriter(new FileWriter(tempFile));
 

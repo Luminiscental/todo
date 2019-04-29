@@ -1,23 +1,38 @@
 package lumi.todo;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Scanner;
 
+import lumi.todo.util.Input;
 import lumi.todo.util.Config;
 
 public class Todo {
 
     public static void main(String[] args) {
 
-        String todoFileName = Config.TODO_FILE.getValue();
-        String tempFileName = todoFileName + "~";
-
         if (args.length == 0) {
 
             System.err.println("Please provide a command");
             printUsage();
 
+            System.exit(1);
+            return;
+        }
+
+        var input = new Input(args);
+
+        String todoFileName = Config.TODO_FILE.getValue();
+
+        if (!input.hasOption("local")) {
+
+            todoFileName = Config.HOME_DIR + todoFileName;
+        }
+
+        String tempFileName = todoFileName + "~";
+
+        if (!input.validate()) {
+
+            System.err.println("Aborting!");
             System.exit(1);
             return;
         }
@@ -37,26 +52,23 @@ public class Todo {
             return;
         }
 
-        var command = args[0];
-        var params = Arrays.copyOfRange(args, 1, args.length);
-
         Scanner scanner = new Scanner(System.in);
 
-        switch (command) {
+        switch (input.getCommand()) {
 
         case "add":
 
-            addCommand(accessor, params);
+            addCommand(accessor, input);
             break;
 
         case "remove":
 
-            removeCommand(accessor, params, scanner);
+            removeCommand(accessor, input, scanner);
             break;
 
         case "replace":
 
-            replaceCommand(accessor, params, scanner);
+            replaceCommand(accessor, input, scanner);
             break;
 
         case "list":
@@ -66,7 +78,7 @@ public class Todo {
 
         case "do":
 
-            doCommand(accessor, params, scanner);
+            doCommand(accessor, input, scanner);
             break;
 
         case "-f":
@@ -75,7 +87,7 @@ public class Todo {
 
         default:
 
-            System.err.println("Unsupported command \"" + command + "\"");
+            System.err.println("Unsupported command \"" + input.getCommand() + "\"");
             printUsage();
 
             System.exit(1);
@@ -96,63 +108,66 @@ public class Todo {
         }
     }
 
-    public static void addCommand(TodoListAccessor accessor, String[] args) {
+    private static void addCommand(TodoListAccessor accessor, Input args) {
 
-        if (args.length < 1) {
+        if (args.getArguments().size() < 1) {
 
             System.err.println("Not enough arguments, add expects one");
         }
 
-        accessor.addItem(args[0]);
+        accessor.addItem(args.getArguments().get(0));
     }
 
-    public static void removeCommand(TodoListAccessor accessor, String[] args, Scanner scanner) {
+    private static void removeCommand(TodoListAccessor accessor, Input args, Scanner scanner) {
 
-        if (args.length < 1) {
+        if (args.getArguments().size() < 1) {
 
             System.err.println("Not enough arguments, remove expects one");
         }
 
-        accessor.removeItem(args[0], scanner);
+        accessor.removeItem(args.getArguments().get(0), scanner);
     }
 
-    public static void replaceCommand(TodoListAccessor accessor, String[] args, Scanner scanner) {
+    private static void replaceCommand(TodoListAccessor accessor, Input args, Scanner scanner) {
 
-        if (args.length < 2) {
+        if (args.getArguments().size() < 2) {
 
             System.err.println("Not enough arguments, replace expects two");
         }
 
-        accessor.replaceItem(args[0], args[1], scanner);
+        var pattern = args.getArguments().get(0);
+        var replacement = args.getArguments().get(1);
+        accessor.replaceItem(pattern, replacement, scanner);
     }
 
-    public static void listCommand(TodoListAccessor accessor) {
+    private static void listCommand(TodoListAccessor accessor) {
 
         accessor.printItems();
     }
 
-    public static void doCommand(TodoListAccessor accessor, String[] args, Scanner scanner) {
+    private static void doCommand(TodoListAccessor accessor, Input args, Scanner scanner) {
 
-        if (args.length < 1) {
+        var argCount = args.getArguments().size();
+        if (argCount < 1) {
 
             System.err.println("Not enough arguments, do expects at least one");
         }
 
         int minutes;
 
-        if (args.length > 1) {
+        if (argCount > 1) {
 
-            minutes = Integer.parseInt(args[1]);
+            minutes = Integer.parseInt(args.getArguments().get(1));
 
         } else {
 
             minutes = Integer.parseInt(Config.TIMEOUT.getValue());
         }
 
-        accessor.doItem(args[0], minutes, scanner);
+        accessor.doItem(args.getArguments().get(0), minutes, scanner);
     }
 
-    public static void printCommandUsage(String command, String description, String template, String example) {
+    private static void printCommandUsage(String command, String description, String template, String example) {
 
         System.out.println();
         System.out.println("\t" + command + " - " + description);
@@ -160,10 +175,15 @@ public class Todo {
         System.out.println("\tExample usage: " + example);
     }
 
-    public static void printUsage() {
+    private static void printUsage() {
 
         System.out.println();
-        System.out.println("Usage: todo <command> <args>");
+        System.out.println("Usage: todo <command> <args> [<options>]");
+
+        System.out.println("Options:");
+        System.out.println();
+        System.out.println("\t--local - If set the list is read from the todo file path relative to the current directory instead of relative to your home directory.");
+
         System.out.println("Commands:");
 
         printCommandUsage("add",
