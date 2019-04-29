@@ -12,7 +12,7 @@ public class Input {
 
     private static final List<String> validOptions = List.of("local");
 
-    public Input(String[] argArray) {
+    public Input(String[] argArray) throws MissingCommandException {
 
         var rawArgs = List.of(argArray);
 
@@ -26,6 +26,12 @@ public class Input {
         arguments = rawArgs.stream()
             .filter(Predicate.not(optionPred))
             .collect(Collectors.toList());
+
+        if (arguments.size() == 0) {
+
+            System.err.println("Please provide a command");
+            throw new MissingCommandException();
+        }
 
         command = arguments.get(0);
         arguments.remove(0);

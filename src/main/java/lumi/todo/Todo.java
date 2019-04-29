@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 import lumi.todo.util.Input;
+import lumi.todo.util.MissingCommandException;
 import lumi.todo.util.Config;
 
 public class Todo {
@@ -19,7 +20,20 @@ public class Todo {
             return;
         }
 
-        var input = new Input(args);
+        Input input;
+
+        try {
+
+            input = new Input(args);
+
+        } catch (MissingCommandException e) {
+
+            System.err.println("Please provide a command");
+            printUsage();
+
+            System.exit(1);
+            return;
+        }
 
         String todoFileName = Config.TODO_FILE.getValue();
 
