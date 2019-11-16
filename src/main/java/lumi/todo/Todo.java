@@ -127,6 +127,7 @@ public class Todo {
         if (args.getArguments().size() < 1) {
 
             System.err.println("Not enough arguments, add expects one");
+            return;
         }
 
         accessor.addItem(args.getArguments().get(0));
@@ -137,6 +138,7 @@ public class Todo {
         if (args.getArguments().size() < 1) {
 
             System.err.println("Not enough arguments, remove expects one");
+            return;
         }
 
         accessor.removeItem(args.getArguments().get(0), scanner);
@@ -147,6 +149,7 @@ public class Todo {
         if (args.getArguments().size() < 2) {
 
             System.err.println("Not enough arguments, replace expects two");
+            return;
         }
 
         var pattern = args.getArguments().get(0);
@@ -165,6 +168,7 @@ public class Todo {
         if (argCount < 1) {
 
             System.err.println("Not enough arguments, do expects at least one");
+            return;
         }
 
         int minutes;
