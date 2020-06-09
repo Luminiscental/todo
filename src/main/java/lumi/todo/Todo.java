@@ -195,6 +195,36 @@ public class Todo {
 
     private static void printUsage() {
 
+
+
+
+
+
+
+
+
+
+
+
+        String x = "a";
+        Object y = x;
+        String z = (String) y;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         System.out.println();
         System.out.println("Usage: todo <command> <args> [<options>]");
 
